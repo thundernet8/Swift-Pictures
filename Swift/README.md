@@ -1,0 +1,1 @@
+## Openstack swift RESTAPI node binding.

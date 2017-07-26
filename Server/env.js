@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.isDev = process.env.NODE_ENV !== "production";
+exports.isProd = process.env.NODE_ENV === "production";
+exports.DOWNLOAD_HOST = exports.isProd ? "i.fuli.news" : "0.0.0.0";
+exports.DOWNLOAD_PORT = exports.isProd ? 8000 : 3000;
+exports.UPLOAD_HOST = exports.isProd ? "s.fuli.news" : "0.0.0.0";
+exports.UPLOAD_PORT = exports.isProd ? 8001 : 3001;
+exports.DELETE_HOST = exports.isProd ? "s.fuli.news" : "0.0.0.0";
+exports.DELETE_PORT = exports.isProd ? 8002 : 3002;
+exports.DOWNLOAD_ALLOW_ORIGIN = ["https://fuli.news"];
