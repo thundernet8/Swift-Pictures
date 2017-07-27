@@ -1,0 +1,2 @@
+export SWIFT_PIC_SHARE_USE = demo
+export SWIFT_PIC_SHARE_PASS = demo
