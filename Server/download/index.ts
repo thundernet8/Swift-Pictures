@@ -8,6 +8,7 @@ import * as express from "express";
 import * as responseTimer from "response-time";
 import * as cors from "cors";
 import * as env from "../env";
+import fileHandler from "./handler";
 
 const app = express();
 app.disable("x-powered-by");
@@ -19,21 +20,18 @@ if (env.isDev) {
 // Cors
 const corsOptions = {
     origin: function(origin, callback) {
-        if (env.DOWNLOAD_ALLOW_ORIGIN.indexOf(origin) !== -1) {
+        if (!origin || env.DOWNLOAD_ALLOW_ORIGIN.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
-            callback(new Error(`Origin ${origin} not allowed`));
+            callback(`Origin ${origin} not allowed`);
         }
     }
 };
 
 // Route
-app.get(/^\/([^\/]+)$/, cors(corsOptions), function(req, res, next) {
-    const fileKey = req.url.slice(1);
-    res.send(fileKey);
-});
+app.get(/^\/([^\/]+)$/, cors(corsOptions), fileHandler);
 
-app.all("*", function(req, res) {
+app.all("*", function(_, res) {
     res.sendStatus(404);
     res.end();
 });
