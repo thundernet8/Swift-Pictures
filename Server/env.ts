@@ -11,3 +11,5 @@ export const DELETE_HOST = isProd ? "s.fuli.news" : "0.0.0.0";
 export const DELETE_PORT = isProd ? 8002 : 3002;
 
 export const DOWNLOAD_ALLOW_ORIGIN = ["https://fuli.news"];
+
+export const KEYSTONE_BASE_URL = "http://controller:5000";

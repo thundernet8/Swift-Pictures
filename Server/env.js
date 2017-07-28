@@ -9,3 +9,4 @@ exports.UPLOAD_PORT = exports.isProd ? 8001 : 3001;
 exports.DELETE_HOST = exports.isProd ? "s.fuli.news" : "0.0.0.0";
 exports.DELETE_PORT = exports.isProd ? 8002 : 3002;
 exports.DOWNLOAD_ALLOW_ORIGIN = ["https://fuli.news"];
+exports.KEYSTONE_BASE_URL = "http://controller:5000";

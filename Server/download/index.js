@@ -17,17 +17,18 @@ if (env.isDev) {
 }
 // Cors
 const corsOptions = {
-    origin: function(origin, callback) {
-        if (env.DOWNLOAD_ALLOW_ORIGIN.indexOf(origin) !== -1) {
-            //callback(null, true);
-        } else {
-            callback(null, new Error(`Origin ${origin} not allowed`));
+    origin: function (origin, callback) {
+        if (!origin || env.DOWNLOAD_ALLOW_ORIGIN.indexOf(origin) !== -1) {
+            callback(null, true);
+        }
+        else {
+            callback(`Origin ${origin} not allowed`);
         }
     }
 };
 // Route
 app.get(/^\/([^\/]+)$/, cors(corsOptions), handler_1.default);
-app.all("*", function(req, res) {
+app.all("*", function (_, res) {
     res.sendStatus(404);
     res.end();
 });
@@ -36,7 +37,5 @@ app.listen(env.DOWNLOAD_PORT, env.DOWNLOAD_HOST, err => {
     if (err) {
         return console.error(err);
     }
-    console.log(
-        `Listening at http://${env.DOWNLOAD_HOST}:${env.DOWNLOAD_PORT}`
-    );
+    console.log(`Listening at http://${env.DOWNLOAD_HOST}:${env.DOWNLOAD_PORT}`);
 });

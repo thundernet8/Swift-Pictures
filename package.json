@@ -7,6 +7,7 @@
     "author": "wuxueqian <wuxueqian2010@hotmail.com>",
     "license": "MIT",
     "dependencies": {
+        "axios": "^0.16.2",
         "cors": "^2.8.4",
         "cross-env": "^5.0.1",
         "express": "^4.15.3",
@@ -21,6 +22,7 @@
     },
     "scripts": {
         "build": "ts-node",
-        "start:dl": "cross-env NODE_ENV=development nodemon --watch Server -e js,ts --exec \"npm run build\" -- ./Server/download/index.ts"
+        "start:dl": "cross-env NODE_ENV=development PROT=5858 nodemon --watch Server -e ts --exec \"npm run build\" -- ./Server/download/index.ts",
+        "debug:dl": "node --inspect ./Server/download"
     }
 }

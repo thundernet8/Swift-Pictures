@@ -3,6 +3,6 @@
  */
 export interface IConnectionOptions {
     url: string; // url to connect to
-    ua: string; // default User-Agent, if empty, use `Node-SwiftClient-v3` instead
+    ua?: string; // default User-Agent, if empty, use `Node-SwiftClient-v3` instead
     timeout?: number; // request timeout
 }
