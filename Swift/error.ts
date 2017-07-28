@@ -1,7 +1,6 @@
 // ExtensibleError
-let ExtensibleError;
 
-function ExtendableErrorBuiltin(Error) {
+function ExtendableErrorBuiltin() {
     function ExtendableBuiltin() {
         Error.apply(this, arguments);
 
@@ -23,6 +22,8 @@ function ExtendableErrorBuiltin(Error) {
             // Set this.stack
             Error.captureStackTrace(this, this.constructor);
         }
+
+        return this;
     }
     ExtendableBuiltin.prototype = Object.create(Error.prototype);
     Object.setPrototypeOf(ExtendableBuiltin, Error);
@@ -30,10 +31,14 @@ function ExtendableErrorBuiltin(Error) {
     return ExtendableBuiltin;
 }
 
-ExtensibleError = ExtendableErrorBuiltin(Error);
+const ExtensibleError = ExtendableErrorBuiltin() as FunctionConstructor;
 
 // Swift Error
-class SwiftError extends ExtensibleError {}
+export class SwiftClientError extends ExtensibleError {
+    constructor(msg?: string) {
+        super(msg as string);
+    }
+}
 
 // Timeout Error
-class TimeoutError extends ExtensibleError {}
+export class TimeoutError extends ExtensibleError {}
