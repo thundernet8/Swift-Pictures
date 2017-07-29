@@ -53,19 +53,9 @@ export default class SwiftClient extends EventEmitter {
     _createConnection = (url: string, stream: boolean = false) => {
         return new HTTPConnection({
             url,
-            stream
+            stream,
+            timeout: this.options.timeout
         });
-    };
-
-    _safeHandler = async handler => {
-        try {
-            return handler().catch(result => {
-                this.emit("error", result.response.data);
-                return null;
-            });
-        } catch (e) {
-            this.emit("error", e);
-        }
     };
 
     /**
@@ -76,12 +66,13 @@ export default class SwiftClient extends EventEmitter {
             username,
             password,
             token,
+            projName,
             projDomain,
             userDomain
         } = this.options;
         const scope = {
             project: {
-                name: projDomain,
+                name: projName,
                 domain: {
                     name: projDomain
                 }
@@ -119,17 +110,20 @@ export default class SwiftClient extends EventEmitter {
                 }
             };
         }
-        const resp = await this._safeHandler(() =>
-            this._createConnection(this.options.authUrl).request(
-                "POST",
-                "/auth/tokens",
-                data
-            )
-        );
-        if (!resp) {
-            return;
-        }
+
+        const resp = await this._createConnection(this.options.authUrl)
+            .request("POST", "/auth/tokens", data)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+
         const { headers } = resp;
+        if (!headers || !resp.data) {
+            // 401 response
+            return new SwiftClientError("Authorization failed");
+        }
+
         const tokenObj = resp.data.token;
         // Store token
         this.authStore = new AuthStore(
@@ -195,12 +189,15 @@ export default class SwiftClient extends EventEmitter {
         headers["X-Auth-Token"] = this.authStore.token;
         headers["Accept-Encoding"] = "gzip";
         headers["Accept"] = "application/json";
-        console.log(headers);
-        const resp = await this._safeHandler(() =>
-            this._createConnection(
-                this.publicStorageEndpoint.url + "/" + name
-            ).request("GET", "/auth/tokens", { limit }, headers)
-        );
+
+        const resp = await this._createConnection(
+            this.publicStorageEndpoint.url
+        )
+            .request("GET", `/${name}`, { limit }, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
         return resp;
     };
 

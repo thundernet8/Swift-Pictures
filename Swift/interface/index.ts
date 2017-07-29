@@ -19,6 +19,7 @@ export interface ISwiftClientOptions {
     password?: string; // password of one keystone user
     token?: string; // keystone token
     tokenDuration?: number; // how long to cache keystone token
+    projName: string; // keystone project name
     projDomain: string; // keystone project domain name
     userDomain: string; // keystone user domain name
 }
