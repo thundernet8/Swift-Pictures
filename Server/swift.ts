@@ -10,4 +10,9 @@ const client = new SwiftClient({
     password: env.OS_PASSWORD
 });
 
+client.on("error", e => {
+    // TODO logger
+    console.log(e);
+});
+
 export default client;

@@ -7,6 +7,8 @@ import HTTPConnection from "./connection";
 import { SwiftClientError } from "./error";
 import * as EventEmitter from "events";
 
+// TODO api request 401 handle and emit error format
+
 const TOKEN_EXPIRY_DURATION = 3600; // keystone auth token expiration duration
 
 export default class SwiftClient extends EventEmitter {
@@ -204,6 +206,25 @@ export default class SwiftClient extends EventEmitter {
     /**
      * swift object
      */
+
+    // get a object content and metadata
+    getObject = async (container: string, name: string, headers: any = {}) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+
+        const resp = await this._createConnection(
+            this.publicStorageEndpoint.url,
+            true // use stream
+        )
+            .request("GET", `/${container}/${name}`, {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
 }
 
 // Utilities
