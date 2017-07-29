@@ -1,6 +1,6 @@
 /**
  * 提供图片的直链服务(Swift object download proxy)
- * 
+ *
  * @Request.uri - https://i.domain.com/<fileHashKey>
  */
 
@@ -41,6 +41,7 @@ app.listen(env.DOWNLOAD_PORT, env.DOWNLOAD_HOST, err => {
     if (err) {
         return console.error(err);
     }
+
     console.log(
         `Listening at http://${env.DOWNLOAD_HOST}:${env.DOWNLOAD_PORT}`
     );

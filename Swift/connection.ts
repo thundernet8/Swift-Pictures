@@ -18,7 +18,7 @@ export default class HTTPConnection extends EventEmitter {
     defaultUA: string;
     constructor(options: IConnectionOptions) {
         super();
-        const { url, ua, timeout } = options;
+        const { url, ua, timeout, stream } = options;
         this.url = url;
         this.parsedUrl = URL.parse(url);
         this.host = this.parsedUrl.hostname;
@@ -33,7 +33,7 @@ export default class HTTPConnection extends EventEmitter {
         this.defaultUA = ua || "Node-SwiftClient-v3";
         this.requestArgs = {
             timeout,
-            stream: true
+            stream
         };
 
         // TODO CA verify
@@ -42,35 +42,23 @@ export default class HTTPConnection extends EventEmitter {
     request = async (
         method: string,
         path: string,
-        _data: any = null,
+        data: any = null,
         headers: any = {},
         _files: any = null
     ) => {
         if (!headers["user-agent"]) {
             headers["user-agent"] = this.defaultUA;
         }
-        const url = `${this.protocol}//${this.parsedUrl.host}${path}`;
+        const url = `${this.protocol}//${this.parsedUrl.host}${this.parsedUrl
+            .path}${path}`;
         try {
             const resp = await axios({
                 url,
-                method: method.toUpperCase(),
+                method,
                 headers,
-                data: {
-                    auth: {
-                        identity: {
-                            methods: ["password"],
-                            password: {
-                                user: {
-                                    name: "demo",
-                                    domain: {
-                                        name: "default"
-                                    },
-                                    password: "root"
-                                }
-                            }
-                        }
-                    }
-                }
+                data,
+                responseType: this.requestArgs.stream ? "stream" : "json",
+                timeout: this.requestArgs.timeout || 10000
             });
             return resp;
         } catch (e) {
