@@ -22,8 +22,9 @@
         "ts-node": "^3.3.0"
     },
     "scripts": {
-        "build": "ts-node",
-        "start:dl": "cross-env NODE_ENV=development nodemon --debug --watch Server --watch Swift -e ts --exec \"npm run build\" Server/download/index.ts 9229",
+        "build": "tsc",
+        "tsnode": "ts-node",
+        "start:dl": "cross-env NODE_ENV=development nodemon --debug --watch Server --watch Swift -e ts --exec \"npm run tsnode\" Server/download/index.ts 9229",
         "debug:dl": "node --inspect ./Server/download"
     }
 }
