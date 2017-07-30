@@ -14,6 +14,10 @@ export const DELETE_HOST = isProd ? "s.fuli.news" : "0.0.0.0";
 export const DELETE_PORT = isProd ? 8002 : 3002;
 
 export const DOWNLOAD_ALLOW_ORIGIN = ["https://fuli.news"];
+export const UPLOAD_ALLOW_ORIGIN = [
+    "https://fuli.news",
+    "http://127.0.0.1:8088"
+];
 
 // OS options
 export const OS_PROJECT_DOMAIN_NAME =
@@ -26,3 +30,16 @@ export const OS_AUTH_URL =
     process.env.OS_AUTH_URL || "http://controller:5000/v3";
 export const OS_IDENTITY_API_VERSION = process.env.OS_IDENTITY_API_VERSION || 3;
 export const OS_IMAGE_API_VERSION = process.env.OS_IMAGE_API_VERSION || 2;
+
+// File options
+export const IMAGE_SIZE_LIMIT = 5 * 1024 * 1024; // bytes
+export const IMAGE_UPLOAD_COUNT_LIMIT = 5;
+export const IMAGE_ALLOW_MIMES = [
+    "image/png",
+    "image/jpg",
+    "image/jpeg",
+    "image/gif",
+    "image/bmp",
+    "image/bitmap",
+    "image/tiff"
+];

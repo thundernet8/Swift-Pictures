@@ -1,0 +1,4 @@
+swift post <container> -r ".r:*"
+swift post <container> -w "AUTH_xxx"
+swift post <container> -m X-Container-Meta-Access-Control-Expose-Headers:Access-Control-Allow-Origin
+swift post <container> -m X-Container-Meta-Access-Control-Allow-Origin:*

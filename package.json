@@ -8,10 +8,14 @@
     "license": "MIT",
     "dependencies": {
         "axios": "^0.16.2",
+        "busboy": "^0.2.14",
         "cors": "^2.8.4",
         "cross-env": "^5.0.1",
         "dotenv": "^4.0.0",
         "express": "^4.15.3",
+        "form-data": "^2.2.0",
+        "image-size": "^0.6.1",
+        "md5": "^2.2.1",
         "response-time": "^2.3.2",
         "typescript": "^2.4.2"
     },
@@ -25,6 +29,7 @@
         "build": "tsc",
         "tsnode": "ts-node",
         "start:dl": "cross-env NODE_ENV=development nodemon --debug --watch Server --watch Swift -e ts --exec \"npm run tsnode\" Server/download/index.ts 9229",
-        "debug:dl": "node --inspect ./Server/download"
+        "debug:dl": "node --inspect ./Server/download",
+        "start:up": "cross-env NODE_ENV=development nodemon --debug --watch Server --watch Swift -e ts --exec \"npm run tsnode\" Server/upload/index.ts 9229"
     }
 }

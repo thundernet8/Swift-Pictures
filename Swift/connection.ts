@@ -4,6 +4,7 @@ import * as URL from "url";
 import * as EventEmitter from "events";
 import { SwiftClientError } from "./error";
 import axios from "axios";
+// import * as Formdata from "form-data";
 
 /**
  * Connection class
@@ -44,11 +45,28 @@ export default class HTTPConnection extends EventEmitter {
         path: string,
         data: any = null,
         headers: any = {},
-        _files: any = null
+        file: string | Buffer | Blob = ""
     ) => {
         if (!headers["user-agent"]) {
             headers["user-agent"] = this.defaultUA;
         }
+
+        // file handle
+        // if (file) {
+        //     // https://cnodejs.org/topic/57e17beac4ae8ff239776de5
+        //     let form = new Formdata();
+        //     const fileString = file.toString();
+        //     form.append("type", "image");
+        //     form.append("media", fileString, { knownLength: 1 });
+        //     if (data) {
+        //         delete data.filename;
+        //         for (let key in data) {
+        //             form.append(key, data[key]);
+        //         }
+        //     }
+        //     data = form;
+        // }
+
         const url = `${this.protocol}//${this.parsedUrl.host}${this.parsedUrl
             .path}${path}`;
         try {
@@ -56,7 +74,7 @@ export default class HTTPConnection extends EventEmitter {
                 url,
                 method,
                 headers,
-                data,
+                data: file || data,
                 responseType: this.requestArgs.stream ? "stream" : "json",
                 timeout: this.requestArgs.timeout || 10000
             });

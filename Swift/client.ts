@@ -47,7 +47,7 @@ export default class SwiftClient extends EventEmitter {
 
     _getDefaultOptions = () => {
         return {
-            tokenExpiration: TOKEN_EXPIRY_DURATION,
+            tokenDuration: TOKEN_EXPIRY_DURATION,
             timeout: 10000
         };
     };
@@ -203,6 +203,25 @@ export default class SwiftClient extends EventEmitter {
         return resp;
     };
 
+    // create container
+    putContainer = async (name: string, headers: any = {}) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+        headers["Accept"] = "application/json";
+
+        const resp = await this._createConnection(
+            this.publicStorageEndpoint.url
+        )
+            .request("PUT", `/${name}`, {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
     /**
      * swift object
      */
@@ -219,6 +238,30 @@ export default class SwiftClient extends EventEmitter {
             true // use stream
         )
             .request("GET", `/${container}/${name}`, {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    // create or replace a object
+    putObject = async (
+        container: string,
+        name: string,
+        headers: any = {},
+        filedata: any = null
+    ) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+
+        const resp = await this._createConnection(
+            this.publicStorageEndpoint.url,
+            false
+        )
+            .request("PUT", `/${container}/${name}`, {}, headers, filedata)
             .catch(result => {
                 this.emit("error", result.response.data);
                 return result;
@@ -256,8 +299,8 @@ class AuthStore {
     get isExpired() {
         const currentTime = Math.ceil(new Date().getTime() / 1000);
         if (
-            this.issueTime + this.cacheDuration >= currentTime ||
-            this.expireTime >= currentTime
+            this.issueTime + this.cacheDuration <= currentTime ||
+            this.expireTime <= currentTime
         ) {
             return true;
         }

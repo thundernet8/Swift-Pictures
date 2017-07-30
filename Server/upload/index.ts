@@ -1,7 +1,7 @@
 /**
- * 提供图片的直链服务(Swift object download proxy)
+ * 提供图片的上传代理服务(Swift object upload proxy)
  *
- * @Request.uri - https://i.domain.com/<fileHashKey>
+ * @Request.uri - https://s.domain.com/upload
  */
 
 import * as express from "express";
@@ -20,7 +20,7 @@ if (env.isDev) {
 // Cors
 const corsOptions = {
     origin: function(origin, callback) {
-        if (!origin || env.DOWNLOAD_ALLOW_ORIGIN.indexOf(origin) !== -1) {
+        if (!origin || env.UPLOAD_ALLOW_ORIGIN.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
             callback(`Origin ${origin} not allowed`);
@@ -29,7 +29,13 @@ const corsOptions = {
 };
 
 // Route
-app.get(/^\/([^\/]+)$/, cors(corsOptions), fileHandler);
+app.options("*", function(_req, res) {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.sendStatus(200);
+    res.end();
+});
+
+app.post("/", cors(corsOptions), fileHandler);
 
 app.all("*", function(_req, res) {
     res.sendStatus(404);
@@ -37,12 +43,10 @@ app.all("*", function(_req, res) {
 });
 
 // Startup
-app.listen(env.DOWNLOAD_PORT, env.DOWNLOAD_HOST, err => {
+app.listen(env.UPLOAD_PORT, env.UPLOAD_HOST, err => {
     if (err) {
         return console.error(err);
     }
 
-    console.log(
-        `Listening at http://${env.DOWNLOAD_HOST}:${env.DOWNLOAD_PORT}`
-    );
+    console.log(`Listening at http://${env.UPLOAD_HOST}:${env.UPLOAD_PORT}`);
 });
