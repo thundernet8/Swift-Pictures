@@ -1,5 +1,7 @@
+import * as path from "path";
+
 // Init process.env
-require("dotenv").config({ path: "../envrc" });
+require("dotenv").config({ path: path.resolve(__dirname, "../envrc") });
 
 export const isDev = process.env.NODE_ENV !== "production";
 export const isProd = process.env.NODE_ENV === "production";
