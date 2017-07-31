@@ -1,0 +1,11 @@
+wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre2-10.22.tar.gz
+apt-get install libpcre3 libpcre3-dev
+
+wget http://zlib.net/zlib-1.2.11.tar.gz
+
+wget https://www.openssl.org/source/openssl-1.1.0f.tar.gz
+
+sudo apt-get install libxml2 libxml2-dev libxslt-dev
+sudo apt-get install libgd-xpm libgd2-xpm-dev
+sudo apt-get install geoip-database libgeoip-dev
+sudo apt-get install libperl-dev

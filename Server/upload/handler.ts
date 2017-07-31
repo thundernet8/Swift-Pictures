@@ -2,7 +2,7 @@ import client from "../swift";
 import * as Busboy from "busboy";
 import * as MD5 from "md5";
 import * as SizeOf from "image-size";
-// import { randCase } from "../util";
+import { randCase, randChars } from "../util";
 import {
     DOWNLOAD_HOST,
     IMAGE_SIZE_LIMIT,
@@ -66,21 +66,28 @@ export default async function(req, res) {
             }
             const md5 = MD5(buffer);
             const demensions = SizeOf(buffer);
-            const containerName =
+            let containerName =
                 md5.slice(1, 2) +
                 md5.slice(5, 6) +
                 md5.slice(10, 11) +
                 md5.slice(20, 21) +
                 md5.slice(25, 26);
+            // containerName should not start with number, first number char has unique use
+            if (/^[0-9].*/.test(containerName)) {
+                containerName = randChars(1) + containerName;
+            }
             const objectName = md5;
             headers = Object.assign(
                 {
                     ["Content-Type"]: mimetype,
-                    ["X-Origin-Name"]: filename,
-                    ["X-Origin-MD5"]: md5,
-                    ["X-Origin-Width"]: demensions.width,
-                    ["X-Origin-Height"]: demensions.height,
-                    ["X-Origin-Size"]: size
+                    ["X-Object-Meta-Name"]: filename,
+                    ["X-Object-Meta-MD5"]: md5,
+                    ["X-Object-Meta-Width"]: demensions.width,
+                    ["X-Object-Meta-Height"]: demensions.height,
+                    ["X-Object-Meta-Size"]: size,
+                    ["X-Object-Meta-IP"]:
+                        req.headers["x-forwarded-for"] ||
+                        req.connection.remoteAddress
                 },
                 headers
             );
@@ -107,14 +114,17 @@ export default async function(req, res) {
                         resp.msg = result.data.toString();
                         res.status(result.status).send(resp);
                     }
+                    const path = `${containerName.lenght}${randCase(
+                        containerName
+                    )}${randCase(objectName)}`;
                     resp.code = 1;
                     resp.result = {
                         filename,
                         size,
                         width: demensions.width,
                         height: demensions.height,
-                        url: `${DOWNLOAD_HOST}/${containerName}-${objectName}`,
-                        path: `/${containerName}-${objectName}`,
+                        url: `${DOWNLOAD_HOST}/${path}`,
+                        path,
                         delete: "" // TODO
                     };
                     res.status(200).send(resp);

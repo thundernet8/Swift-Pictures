@@ -111,13 +111,16 @@
 #	}
 #}
 
-upstream dl-node {
-  server localhost:8000;
-}
+perl_set $uri_lowercase 'sub {
+    my $r = shift;
+    my $uri = $r->uri;
+    $uri = lc($uri);
+    return $uri;
+}';
 
 server {
       listen 80;
-      #server_name api.fuli.news;
+      #server_name i.fuli.news;
       server_tokens   off;
       gzip on;
       gzip_disable "MSIE [1-6]\.";
@@ -131,11 +134,48 @@ server {
       location / {
           #limit_req zone=one;
           #limit_conn addr 10;
-		  set $account AUTH_xxx;
-		  if ($request_uri ~ "/([^?/]*)-([^?/]*)") {
-				set $container $1;
-				set $object $2;
-			}
+          #set your share swift account
+          set $account AUTH_xxx;
+          if ($uri_lowercase ~* "/([0-9a-z]+)-([0-9a-z\._-]+)") {
+              set $container $1;
+              set $object $2;
+          }
+		  if ($uri_lowercase ~* "/1([0-9a-z]{1})([0-9a-z\._-]+)") {
+              set $container $1;
+              set $object $2;
+          }
+		  if ($uri_lowercase ~* "/2([0-9a-z]{2})([0-9a-z\._-]+)") {
+              set $container $1;
+              set $object $2;
+          }
+		  if ($uri_lowercase ~* "/3([0-9a-z]{3})([0-9a-z\._-]+)") {
+              set $container $1;
+              set $object $2;
+          }
+		  if ($uri_lowercase ~* "/4([0-9a-z]{4})([0-9a-z\._-]+)") {
+              set $container $1;
+              set $object $2;
+          }
+		  if ($uri_lowercase ~* "/5([0-9a-z]{5})([0-9a-z\._-]+)") {
+              set $container $1;
+              set $object $2;
+          }
+		  if ($uri_lowercase ~* "/6([0-9a-z]{6})([0-9a-z\._-]+)") {
+              set $container $1;
+              set $object $2;
+          }
+		  if ($uri_lowercase ~* "/7([0-9a-z]{7})([0-9a-z\._-]+)") {
+              set $container $1;
+              set $object $2;
+          }
+		  if ($uri_lowercase ~* "/8([0-9a-z]{8})([0-9a-z\._-]+)") {
+              set $container $1;
+              set $object $2;
+          }
+		  if ($uri_lowercase ~* "/9([0-9a-z]{9})([0-9a-z\._-]+)") {
+              set $container $1;
+              set $object $2;
+          }
           proxy_pass http://127.0.0.1:8080/v1/$account/$container/$object;
           proxy_http_version 1.1;
           proxy_set_header   Host               $http_host;
@@ -153,5 +193,5 @@ server {
           proxy_read_timeout 600;
       }
 
-      access_log  /home/test.dl.log;
+      access_log  /home/access_image_download.log;
   }
