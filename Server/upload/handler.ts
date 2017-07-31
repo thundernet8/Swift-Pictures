@@ -74,7 +74,7 @@ export default async function(req, res) {
                 md5.slice(25, 26);
             // containerName should not start with number, first number char has unique use
             if (/^[0-9].*/.test(containerName)) {
-                containerName = randChars(1) + containerName;
+                containerName = (randChars(1) + containerName).toLowerCase();
             }
             const objectName = md5;
             headers = Object.assign(
