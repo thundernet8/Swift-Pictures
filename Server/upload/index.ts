@@ -35,7 +35,7 @@ app.options("*", function(_req, res) {
     res.end();
 });
 
-app.post("/", cors(corsOptions), fileHandler);
+app.post("/upload", cors(corsOptions), fileHandler);
 
 app.all("*", function(_req, res) {
     res.sendStatus(404);
