@@ -11,9 +11,13 @@ export function randStr(length: number, chars?: string) {
     }
     const availableCharLength = chars.length;
     const charsArr = chars.split("");
-    return new Array(Number(length)).map(
-        () => charsArr[Math.floor(Math.random() * (availableCharLength - 1))]
-    );
+    return new Array(Number(length))
+        .fill("")
+        .map(
+            () =>
+                charsArr[Math.floor(Math.random() * (availableCharLength - 1))]
+        )
+        .join("");
 }
 
 export function randChars(length: number) {
