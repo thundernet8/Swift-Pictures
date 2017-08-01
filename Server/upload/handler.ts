@@ -2,7 +2,7 @@ import client from "../swift";
 import * as Busboy from "busboy";
 import * as MD5 from "md5";
 import * as SizeOf from "image-size";
-import { randCase, randChars, randStr } from "../util";
+import { randCase, randChars } from "../util";
 import {
     DOWNLOAD_HOST,
     IMAGE_SIZE_LIMIT,
@@ -110,12 +110,14 @@ export default async function(req, res) {
                             console.log(
                                 `put object with ${result.status} status error`
                             );
+                            console.log(result);
                         }
                         resp.msg = result.data.toString();
                         res.status(result.status).send(resp);
                     }
-                    const path = `${randStr(
-                        1
+                    const path = `${md5.slice(
+                        15,
+                        16
                     )}${containerName.length}${randCase(
                         containerName
                     )}${randCase(objectName)}`;
