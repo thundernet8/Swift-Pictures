@@ -2,7 +2,7 @@ import client from "../swift";
 import * as Busboy from "busboy";
 import * as MD5 from "md5";
 import * as SizeOf from "image-size";
-import { randCase, randChars } from "../util";
+import { randCase } from "../util";
 import {
     DOWNLOAD_HOST,
     IMAGE_SIZE_LIMIT,
@@ -74,13 +74,21 @@ export default async function(req, res) {
                 md5.slice(25, 26);
             // containerName should not start with number, first number char has unique use
             if (/^[0-9].*/.test(containerName)) {
-                containerName = (randChars(1) + containerName).toLowerCase();
+                let i = md5.length - 1;
+                while (i >= 0) {
+                    const letter = md5.slice(i, i + 1);
+                    if (/[a-z]/i.test(letter)) {
+                        containerName = (letter + containerName).toLowerCase();
+                        break;
+                    }
+                    i--;
+                }
             }
             const objectName = md5;
             headers = Object.assign(
                 {
                     ["Content-Type"]: mimetype,
-                    ["X-Object-Meta-Name"]: filename,
+                    ["X-Object-Meta-Name"]: encodeURIComponent(filename),
                     ["X-Object-Meta-MD5"]: md5,
                     ["X-Object-Meta-Width"]: demensions.width,
                     ["X-Object-Meta-Height"]: demensions.height,
@@ -140,6 +148,7 @@ export default async function(req, res) {
                             : err.response.data.message;
                     if (isDev) {
                         console.log(`put object with error: ${resp.msg}`);
+                        console.log(err);
                     }
                     res.status(err.status || 400).send(resp);
                 });

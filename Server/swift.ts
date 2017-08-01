@@ -12,7 +12,9 @@ const client = new SwiftClient({
 
 client.on("error", e => {
     // TODO logger
-    console.log(e);
+    if (env.isDev) {
+        console.log(e);
+    }
 });
 
 export default client;
