@@ -23,9 +23,9 @@ export const UPLOAD_ALLOW_ORIGIN = [
 ];
 
 // Public host
-export const PUBLIC_DOWNLOAD_HOST = "http://i.fuli.news";
-export const PUBLIC_UPLOAD_HOST = "http://s.fuli.news";
-export const PUBLIC_DELETE_HOST = "http://s.fuli.news";
+export const PUBLIC_DOWNLOAD_HOST = "https://i.fuli.news";
+export const PUBLIC_UPLOAD_HOST = "https://s.fuli.news";
+export const PUBLIC_DELETE_HOST = "https://s.fuli.news";
 
 // OS options
 export const OS_PROJECT_DOMAIN_NAME =
