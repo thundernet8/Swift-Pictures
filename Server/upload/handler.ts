@@ -4,7 +4,7 @@ import * as MD5 from "md5";
 import * as SizeOf from "image-size";
 import { randCase } from "../util";
 import {
-    DOWNLOAD_HOST,
+    PUBLIC_DOWNLOAD_HOST,
     IMAGE_SIZE_LIMIT,
     IMAGE_ALLOW_MIMES,
     isDev
@@ -135,7 +135,7 @@ export default async function(req, res) {
                         size,
                         width: demensions.width,
                         height: demensions.height,
-                        url: `${DOWNLOAD_HOST}/${path}`,
+                        url: `${PUBLIC_DOWNLOAD_HOST}/${path}`,
                         path,
                         delete: "" // TODO
                     };

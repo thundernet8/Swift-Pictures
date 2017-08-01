@@ -6,20 +6,26 @@ require("dotenv").config({ path: path.resolve(__dirname, "../envrc") });
 export const isDev = process.env.NODE_ENV !== "production";
 export const isProd = process.env.NODE_ENV === "production";
 
-export const DOWNLOAD_HOST = isProd ? "i.fuli.news" : "0.0.0.0";
+export const DOWNLOAD_HOST = isProd ? "127.0.0.1" : "0.0.0.0";
 export const DOWNLOAD_PORT = isProd ? 8000 : 3005;
 
-export const UPLOAD_HOST = isProd ? "s.fuli.news" : "0.0.0.0";
+export const UPLOAD_HOST = isProd ? "127.0.0.1" : "0.0.0.0";
 export const UPLOAD_PORT = isProd ? 8001 : 3001;
 
-export const DELETE_HOST = isProd ? "s.fuli.news" : "0.0.0.0";
+export const DELETE_HOST = isProd ? "127.0.0.1" : "0.0.0.0";
 export const DELETE_PORT = isProd ? 8002 : 3002;
 
-export const DOWNLOAD_ALLOW_ORIGIN = ["https://fuli.news"];
+export const DOWNLOAD_ALLOW_ORIGIN = ["https://fuli.news", "http://fuli.news"];
 export const UPLOAD_ALLOW_ORIGIN = [
     "https://fuli.news",
+    "http://fuli.news",
     "http://127.0.0.1:8088"
 ];
+
+// Public host
+export const PUBLIC_DOWNLOAD_HOST = "http://i.fuli.news";
+export const PUBLIC_UPLOAD_HOST = "http://s.fuli.news";
+export const PUBLIC_DELETE_HOST = "http://s.fuli.news";
 
 // OS options
 export const OS_PROJECT_DOMAIN_NAME =
