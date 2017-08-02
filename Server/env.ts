@@ -21,6 +21,11 @@ export const UPLOAD_ALLOW_ORIGIN = [
     "http://fuli.news",
     "http://127.0.0.1:8088"
 ];
+export const DELETE_ALLOW_ORIGIN = [
+    "https://fuli.news",
+    "http://fuli.news",
+    "http://127.0.0.1:8088"
+];
 
 // Public host
 export const PUBLIC_DOWNLOAD_HOST = "https://i.fuli.news";

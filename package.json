@@ -8,6 +8,7 @@
     "license": "MIT",
     "dependencies": {
         "axios": "^0.16.2",
+        "body-parser": "^1.17.2",
         "busboy": "^0.2.14",
         "cors": "^2.8.4",
         "cross-env": "^5.0.1",
@@ -28,8 +29,9 @@
     "scripts": {
         "build": "tsc",
         "tsnode": "ts-node",
-        "start:dl": "cross-env NODE_ENV=development nodemon --debug --watch Server --watch Swift -e ts --exec \"npm run tsnode\" Server/download/index.ts 9229",
+        "start:dl": "cross-env NODE_ENV=development nodemon --watch Server --watch Swift -e ts --exec \"npm run tsnode\" Server/download/index.ts",
         "debug:dl": "node --inspect ./Server/download",
-        "start:up": "cross-env NODE_ENV=development nodemon --debug --watch Server --watch Swift -e ts --exec \"npm run tsnode\" Server/upload/index.ts 9229"
+        "start:up": "cross-env NODE_ENV=development nodemon --watch Server --watch Swift -e ts --exec \"npm run tsnode\" Server/upload/index.ts",
+        "start:del": "cross-env NODE_ENV=development nodemon --watch Server --watch Swift -e ts --exec \"npm run tsnode\" Server/delete/index.ts"
     }
 }
