@@ -268,6 +268,29 @@ export default class SwiftClient extends EventEmitter {
             });
         return resp;
     };
+
+    // delete object
+    deleteObject = async (
+        container: string,
+        name: string,
+        headers: any = {}
+    ) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+
+        const resp = await this._createConnection(
+            this.publicStorageEndpoint.url,
+            false
+        )
+            .request("DELETE", `/${container}/${name}`, {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
 }
 
 // Utilities

@@ -21,6 +21,11 @@ export const UPLOAD_ALLOW_ORIGIN = [
     "http://fuli.news",
     "http://127.0.0.1:8088"
 ];
+export const DELETE_ALLOW_ORIGIN = [
+    "https://fuli.news",
+    "http://fuli.news",
+    "http://127.0.0.1:8088"
+];
 
 // Public host
 export const PUBLIC_DOWNLOAD_HOST = "https://i.fuli.news";
@@ -51,3 +56,8 @@ export const IMAGE_ALLOW_MIMES = [
     "image/bitmap",
     "image/tiff"
 ];
+
+// Redis
+export const REDIS_HOST = "127.0.0.1";
+export const REDIS_PORT = 6379;
+export const REDIS_PASSWORD = process.env.REDIS_PASSWORD || "";

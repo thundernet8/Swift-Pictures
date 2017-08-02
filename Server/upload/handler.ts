@@ -1,16 +1,36 @@
-import client from "../swift";
 import * as Busboy from "busboy";
 import * as MD5 from "md5";
 import * as SizeOf from "image-size";
+import client from "../swift";
+import redis from "../redis";
+import * as uuidv4 from "uuid/v4";
 import { randCase } from "../util";
 import {
     PUBLIC_DOWNLOAD_HOST,
     IMAGE_SIZE_LIMIT,
     IMAGE_ALLOW_MIMES,
+    PUBLIC_DELETE_HOST,
     isDev
 } from "../env";
 
 // TODO 上传频度限制
+
+const addDeleteLink = (
+    containerName: string,
+    objectName: string,
+    imageUrl: string
+) => {
+    const key = uuidv4();
+    const value = `${containerName}|${objectName}`;
+    redis.set(key, value);
+    const deleteLink = `${PUBLIC_DELETE_HOST}/delete/${key}`;
+    if (isDev) {
+        console.log(
+            `Redis set delete link: ${deleteLink}\nFor image link: ${imageUrl}`
+        );
+    }
+    return deleteLink;
+};
 
 export default async function(req, res) {
     if (isDev) {
@@ -129,15 +149,16 @@ export default async function(req, res) {
                     )}${containerName.length}${randCase(
                         containerName
                     )}${randCase(objectName)}`;
+                    const url = `${PUBLIC_DOWNLOAD_HOST}/${path}`;
                     resp.code = 1;
                     resp.result = {
                         filename,
                         size,
                         width: demensions.width,
                         height: demensions.height,
-                        url: `${PUBLIC_DOWNLOAD_HOST}/${path}`,
+                        url,
                         path,
-                        delete: "" // TODO
+                        delete: addDeleteLink(containerName, objectName, url)
                     };
                     res.status(200).send(resp);
                 })
