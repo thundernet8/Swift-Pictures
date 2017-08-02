@@ -94,6 +94,9 @@ export async function deleteLinkHandler(req, res) {
                 res.status(result.status).send("Delete image failed");
             }
 
+            // clear redis deleteKey
+            redisClient.del(deleteKey);
+
             res.status(200).send("Image deleted successfully");
         })
         .catch(err => {
