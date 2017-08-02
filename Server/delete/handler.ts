@@ -1,6 +1,8 @@
 import client from "../swift";
 import { isDev } from "../env";
+import redisClient from "../redis";
 
+// API request delete
 export default async function(req, res) {
     if (isDev) {
         console.log(req.url);
@@ -47,5 +49,49 @@ export default async function(req, res) {
                 console.log(err);
             }
             res.status(err.status || 400).send(resp);
+        });
+}
+
+// Page request delete
+export async function deleteLinkHandler(req, res) {
+    const deleteKey = req.url.slice(1); // query args not allowed
+    const value = await redisClient.getAsync(deleteKey).catch(err => {
+        if (isDev) {
+            console.log(
+                `Redis get value for key ${deleteKey} failed: ${err.toString()}`
+            );
+        }
+        res.status(500).send("Delete image failed");
+    });
+    if (!value) {
+        res.status(204).send("Image has been deleted before");
+    }
+
+    const [containerName, objectName] = value.split("|");
+
+    return client
+        .deleteObject(containerName, objectName)
+        .then(result => {
+            if (result.status < 200 || result.status >= 300) {
+                if (isDev) {
+                    console.log(
+                        `delete object with ${result.status} status error`
+                    );
+                    console.log(result);
+                }
+                // result.data.toString();
+                res.status(result.status).send("Delete image failed");
+            }
+
+            res.status(200).send("Image deleted successfully");
+        })
+        .catch(err => {
+            const msg =
+                err instanceof Error ? err.message : err.response.data.message;
+            if (isDev) {
+                console.log(`delete object with error: ${msg}`);
+                console.log(err);
+            }
+            res.status(err.status || 400).send(msg);
         });
 }

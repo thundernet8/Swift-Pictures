@@ -56,3 +56,8 @@ export const IMAGE_ALLOW_MIMES = [
     "image/bitmap",
     "image/tiff"
 ];
+
+// Redis
+export const REDIS_HOST = "127.0.0.1";
+export const REDIS_PORT = 6379;
+export const REDIS_PASSWORD = process.env.REDIS_PASSWORD || "";

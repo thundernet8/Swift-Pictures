@@ -9,7 +9,7 @@ import * as responseTimer from "response-time";
 import * as cors from "cors";
 import * as bodyParser from "body-parser";
 import * as env from "../env";
-import fileHandler from "./handler";
+import fileHandler, { deleteLinkHandler } from "./handler";
 
 const app = express();
 app.disable("x-powered-by");
@@ -35,6 +35,8 @@ app.options("*", function(_req, res) {
     res.sendStatus(200);
     res.end();
 });
+
+app.get(/^\/delete\/([^\/]+)$/, deleteLinkHandler);
 
 app.post("/delete", cors(corsOptions), bodyParser.json(), fileHandler);
 
