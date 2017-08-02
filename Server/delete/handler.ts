@@ -54,10 +54,14 @@ export default async function(req, res) {
 
 // Page request delete
 export async function deleteLinkHandler(req, res) {
-    const deleteKey = req.url.slice(1); // query args not allowed
+    const match = req.url.match(/\/delete\/([0-9a-z-]+)/i);
+    let deleteKey = "";
+    if (match && match.length > 1) {
+        deleteKey = match[1];
+    }
     if (isDev) {
         console.log(
-            `Redis get image storage info using delete key ${deleteKey}}`
+            `Redis get image storage info using delete key ${deleteKey}`
         );
     }
     const value = await redisClient.getAsync(deleteKey).catch(err => {
@@ -69,7 +73,9 @@ export async function deleteLinkHandler(req, res) {
         res.status(500).send("Delete image failed");
     });
     if (!value) {
-        res.status(200).send("Image has been deleted before");
+        res
+            .status(200)
+            .send("Invalid delete link or image has been deleted before");
     }
 
     const [containerName, objectName] = value.split("|");
