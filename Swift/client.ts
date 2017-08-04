@@ -7,7 +7,8 @@ import HTTPConnection from "./connection";
 import { SwiftClientError } from "./error";
 import * as EventEmitter from "events";
 
-// TODO api request 401 handle and emit error format
+// API docs
+// https://developer.openstack.org/api-ref/object-store/
 
 const TOKEN_EXPIRY_DURATION = 3600; // keystone auth token expiration duration
 
@@ -19,15 +20,16 @@ export default class SwiftClient extends EventEmitter {
         super();
         const {
             authUrl,
+            swiftBaseUrl,
             username,
             password,
             token,
             projDomain,
             userDomain
         } = options;
-        if (!authUrl || !projDomain || !userDomain) {
+        if (!authUrl || !swiftBaseUrl || !projDomain || !userDomain) {
             const err = new SwiftClientError(
-                "Missing paramters authUrl or domains in options"
+                "Missing paramters authUrl or swiftBaseUrl or domains in options"
             );
             this.emit("error", err);
             return;
@@ -173,29 +175,160 @@ export default class SwiftClient extends EventEmitter {
     }
 
     /**
+     * swift discoverability
+     */
+
+    // query {
+    //     swiftinfo_sig: string;
+    //     swiftinfo_expires: number;
+    // }
+    discover = async (query?: any) => {
+        await this._ensureFreshToken();
+        const headers = {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+        headers["Accept"] = "application/json";
+
+        const resp = await this._createConnection(
+            this.options.swiftBaseUrl,
+            false
+        )
+            .request("GET", "/info", query, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    /**
      * swift account
      */
 
-    /**
-     * swift container
-     */
-
-    // get a listing of objects for the container
-    getContainer = async (
-        name: string,
-        limit: number = 20,
-        headers: any = {}
-    ) => {
+    // show account details and list containers
+    // query {
+    //     limit?: number;
+    //     marker?: string;
+    //     end_marker?: string;
+    //     prefix?: string;
+    //     delimiter?: string;
+    // }
+    getAccounts = async (name: string, query: any, headers: any = {}) => {
         await this._ensureFreshToken();
         headers = headers || {};
         headers["X-Auth-Token"] = this.authStore.token;
         headers["Accept-Encoding"] = "gzip";
         headers["Accept"] = "application/json";
 
+        const url = name
+            ? this.options.swiftBaseUrl + "/" + name
+            : this.internalStorageEndpoint.url;
+
+        const resp = await this._createConnection(url, false)
+            .request("GET", "", query, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    // create update or delete account metadata
+    // X-Account-Meta-name to create or update meta with name
+    // X-Remove-Account-name to delete meta with name
+    postAccount = async (name: string, headers: any = {}) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+        headers["Accept"] = "application/json";
+
+        const url = name
+            ? this.options.swiftBaseUrl + "/" + name
+            : this.internalStorageEndpoint.url;
+
+        const resp = await this._createConnection(url)
+            .request("POST", "", {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    // show account metadata
+    headAccount = async (name: string, headers: any = {}) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+        headers["Accept"] = "application/json";
+
+        const url = name
+            ? this.options.swiftBaseUrl + "/" + name
+            : this.internalStorageEndpoint.url;
+
+        const resp = await this._createConnection(url)
+            .request("HEAD", "", {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    /**
+     * swift container
+     */
+
+    // create update or delete container metadata
+    postContainer = async (name: string, headers: any = {}) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+        headers["Accept"] = "application/json";
+        // metadata should saved in headers with `X-Container-Meta-your meta name' key
         const resp = await this._createConnection(
-            this.publicStorageEndpoint.url
+            this.internalStorageEndpoint.url
         )
-            .request("GET", `/${name}`, { limit }, headers)
+            .request("POST", `/${name}`, {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    // show container metadata
+    headContainer = async (name: string, headers: any = {}) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+        headers["Accept"] = "application/json";
+        const resp = await this._createConnection(
+            this.internalStorageEndpoint.url
+        )
+            .request("PUT", `/${name}`, {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    // delete container
+    deleteContainer = async (name: string, headers: any = {}) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+        headers["Accept"] = "application/json";
+        const resp = await this._createConnection(
+            this.internalStorageEndpoint.url
+        )
+            .request("DELETE", `/${name}`, {}, headers)
             .catch(result => {
                 this.emit("error", result.response.data);
                 return result;
@@ -212,7 +345,26 @@ export default class SwiftClient extends EventEmitter {
         headers["Accept"] = "application/json";
 
         const resp = await this._createConnection(
-            this.publicStorageEndpoint.url
+            this.internalStorageEndpoint.url
+        )
+            .request("PUT", `/${name}`, {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    // get container details and list objects
+    getContainer = async (name: string, headers: any = {}) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+        headers["Accept"] = "application/json";
+
+        const resp = await this._createConnection(
+            this.internalStorageEndpoint.url
         )
             .request("PUT", `/${name}`, {}, headers)
             .catch(result => {
@@ -234,7 +386,7 @@ export default class SwiftClient extends EventEmitter {
         headers["Accept-Encoding"] = "gzip";
 
         const resp = await this._createConnection(
-            this.publicStorageEndpoint.url,
+            this.internalStorageEndpoint.url,
             true // use stream
         )
             .request("GET", `/${container}/${name}`, {}, headers)
@@ -258,7 +410,7 @@ export default class SwiftClient extends EventEmitter {
         headers["Accept-Encoding"] = "gzip";
 
         const resp = await this._createConnection(
-            this.publicStorageEndpoint.url,
+            this.internalStorageEndpoint.url,
             false
         )
             .request("PUT", `/${container}/${name}`, {}, headers, filedata)
@@ -281,10 +433,70 @@ export default class SwiftClient extends EventEmitter {
         headers["Accept-Encoding"] = "gzip";
 
         const resp = await this._createConnection(
-            this.publicStorageEndpoint.url,
+            this.internalStorageEndpoint.url,
             false
         )
             .request("DELETE", `/${container}/${name}`, {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    // show object metadata
+    headObject = async (container: string, name: string, headers: any = {}) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+
+        const resp = await this._createConnection(
+            this.internalStorageEndpoint.url,
+            false
+        )
+            .request("HEAD", `/${container}/${name}`, {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    // create or update obejct metadata
+    postObject = async (container: string, name: string, headers: any = {}) => {
+        await this._ensureFreshToken();
+        headers = headers || {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+
+        const resp = await this._createConnection(
+            this.internalStorageEndpoint.url,
+            false
+        )
+            .request("POST", `/${container}/${name}`, {}, headers)
+            .catch(result => {
+                this.emit("error", result.response.data);
+                return result;
+            });
+        return resp;
+    };
+
+    /**
+     * swift endpoints
+     */
+
+    // get exposed endpoints
+    // swiftBaseUrl: e.g. http://controller:8080/v1
+    getEndpoints = async (swiftBaseUrl?: string) => {
+        await this._ensureFreshToken();
+        const headers = {};
+        headers["X-Auth-Token"] = this.authStore.token;
+        headers["Accept-Encoding"] = "gzip";
+
+        swiftBaseUrl = swiftBaseUrl || this.options.swiftBaseUrl;
+        const resp = await this._createConnection(swiftBaseUrl, false)
+            .request("GET", `/endpoints`, {}, headers)
             .catch(result => {
                 this.emit("error", result.response.data);
                 return result;

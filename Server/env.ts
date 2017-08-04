@@ -41,6 +41,8 @@ export const OS_USERNAME = process.env.OS_USERNAME;
 export const OS_PASSWORD = process.env.OS_PASSWORD;
 export const OS_AUTH_URL =
     process.env.OS_AUTH_URL || "http://controller:5000/v3";
+export const OS_SWIFT_URL =
+    process.env.OS_SWIFT_URL || "http://controller:8080/v1";
 export const OS_IDENTITY_API_VERSION = process.env.OS_IDENTITY_API_VERSION || 3;
 export const OS_IMAGE_API_VERSION = process.env.OS_IMAGE_API_VERSION || 2;
 

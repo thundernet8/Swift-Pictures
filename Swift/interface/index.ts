@@ -12,7 +12,8 @@ export interface IConnectionOptions {
  * SwiftClient class 构造方法参数接口
  */
 export interface ISwiftClientOptions {
-    authUrl: string; // Keystone auth service base url
+    authUrl: string; // Keystone auth service base url e.g http://controller:5000/v3
+    swiftBaseUrl: string; // Swift service base url e.g http://controller:8080/v1
     ua?: string;
     timeout?: number;
     username?: string; // name of one keystone user

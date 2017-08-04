@@ -3,6 +3,7 @@ import SwiftClient from "../Swift/client";
 
 const client = new SwiftClient({
     authUrl: env.OS_AUTH_URL,
+    swiftBaseUrl: env.OS_SWIFT_URL,
     projName: env.OS_PROJECT_NAME,
     projDomain: env.OS_PROJECT_DOMAIN_NAME,
     userDomain: env.OS_USER_DOMAIN_NAME,
